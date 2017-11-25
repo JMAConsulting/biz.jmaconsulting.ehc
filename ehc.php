@@ -156,3 +156,23 @@ function ehc_civicrm_buildForm($formName, &$form) {
     CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/CRM/js/premiums.js');
   }
 }
+
+
+function ehc_civicrm_alterMailParams(&$params, $context){
+  if (!empty($params['valueName'])
+    && $params['valueName'] == 'contribution_online_receipt'
+  ) {
+    $tplParams = $params['tplParams'];
+    $priceFieldValueId = reset($tplParams['lineItem']);
+    $priceFieldValueId = reset($priceFieldValueId);
+
+    if (in_array($priceFieldValueId['price_field_value_id'], array(77, 79))) {
+      foreach ($tplParams['customPost'] as $key => $value) {
+        if (!(strstr($key, 'Person 1'))) {
+          unset($tplParams['customPost'][$key]);
+        }
+      }
+    }
+    $params['tplParams'] = $tplParams;
+  }
+}
