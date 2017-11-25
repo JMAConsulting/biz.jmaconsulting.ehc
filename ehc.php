@@ -161,6 +161,8 @@ function ehc_civicrm_buildForm($formName, &$form) {
 function ehc_civicrm_alterMailParams(&$params, $context){
   if (!empty($params['valueName'])
     && $params['valueName'] == 'contribution_online_receipt'
+    && !empty($params['tplParams']['contributionPageId'])
+    && $params['tplParams']['contributionPageId'] == PREMIUM_CONTRIBUTION_PAGE
   ) {
     $tplParams = $params['tplParams'];
     $priceFieldValueId = reset($tplParams['lineItem']);
