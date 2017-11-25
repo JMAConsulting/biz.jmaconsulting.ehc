@@ -2,7 +2,7 @@
 
 require_once 'ehc.civix.php';
 use CRM_Ehc_ExtensionUtil as E;
-
+define('PREMIUM_CONTRIBUTION_PAGE', 7);
 /**
  * Implements hook_civicrm_config().
  *
@@ -123,30 +123,36 @@ function ehc_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _ehc_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
+function ehc_civicrm_buildForm($formName, &$form) {
+  if (in_array(
+    $formName,
+    array(
+      'CRM_Contribute_Form_Contribution_Main',
+      'CRM_Contribute_Form_Contribution_Confirm',
+      'CRM_Contribute_Form_Contribution_ThankYou',
+    )
+  )) {
+    if ($form->_id != PREMIUM_CONTRIBUTION_PAGE) {
+      return FALSE;
+    }
+    $option = '';
+    if ($formName != 'CRM_Contribute_Form_Contribution_Main') {
+      $priceFieldValue = $form->_params['price_27'];
+      $name = $form->_priceSet['fields'][27]['options'][$priceFieldValue]['name'];
+      if (strstr($name, '_two_')) {
+        $option = 'show';
+      }
+      else{
+        $option = 'hide';
+      }
+    }
+    else {
+      $form->setDefaults(array('selectProduct' => 8));
+    }
 
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function ehc_civicrm_preProcess($formName, &$form) {
-
-} // */
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
-function ehc_civicrm_navigationMenu(&$menu) {
-  _ehc_civix_insert_navigation_menu($menu, NULL, array(
-    'label' => E::ts('The Page'),
-    'name' => 'the_page',
-    'url' => 'civicrm/the-page',
-    'permission' => 'access CiviReport,access CiviContribute',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _ehc_civix_navigationMenu($menu);
-} // */
+    CRM_Core_Resources::singleton()->addSetting(
+      ['showHideOption' => $option]
+    );
+    CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/CRM/js/premiums.js');
+  }
+}
