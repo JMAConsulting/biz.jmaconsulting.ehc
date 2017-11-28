@@ -10,6 +10,7 @@ define('PREMIUM_CONTRIBUTION_PAGE', 7);
  */
 function ehc_civicrm_config(&$config) {
   _ehc_civix_civicrm_config($config);
+  CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.ehc', 'css/style.css');
 }
 
 /**
