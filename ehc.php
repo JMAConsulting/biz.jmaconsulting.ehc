@@ -1,7 +1,6 @@
 <?php
 
 require_once 'ehc.civix.php';
-use CRM_Ehc_ExtensionUtil as E;
 define('PREMIUM_CONTRIBUTION_PAGE', 7);
 /**
  * Implements hook_civicrm_config().
@@ -28,6 +27,13 @@ function ehc_civicrm_xmlMenu(&$files) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
 function ehc_civicrm_install() {
+  civicrm_api3('OptionValue', 'create', array(
+    'option_group_id' => 'cg_extend_objects',
+    'label' => ts('Contribution Page'),
+    'name' => 'civicrm_contribution_page',
+    'value' => 'ContributionPage',
+    'is_active' => 1,
+  ));
   _ehc_civix_civicrm_install();
 }
 
@@ -124,6 +130,28 @@ function ehc_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _ehc_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
+function ehc_civicrm_preProcess($formName, &$form) {
+  if ($formName == 'CRM_Contribute_Form_ContributionPage_Settings') {
+    $form->assign('customDataType', 'ContributionPage');
+    if (!empty($_POST['hidden_custom'])) {
+      $form->set('type', 'ContributionPage');
+
+      CRM_Custom_Form_CustomData::preProcess($form, NULL, NULL, 1, 'ContributionPage', $form->getVar('_id'));
+      CRM_Custom_Form_CustomData::buildQuickForm($form);
+      CRM_Custom_Form_CustomData::setDefaultValues($form);
+    }
+  }
+}
+
+function ehc_civicrm_postProcess($formName, &$form) {
+  if ($formName == 'CRM_Contribute_Form_ContributionPage_Settings' && ($id = $form->getVar('_id'))) {
+    $customValues = CRM_Core_BAO_CustomField::postProcess($form->_submitValues, $id, 'ContributionPage');
+    if (!empty($customValues) && is_array($customValues)) {
+      CRM_Core_BAO_CustomValueTable::store($customValues, 'civicrm_contribution_page', $id);
+    }
+  }
+}
+
 function ehc_civicrm_buildForm($formName, &$form) {
   if (in_array(
     $formName,
@@ -155,6 +183,11 @@ function ehc_civicrm_buildForm($formName, &$form) {
       ['showHideOption' => $option]
     );
     CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/CRM/js/premiums.js');
+  }
+  elseif ($formName == 'CRM_Contribute_Form_ContributionPage_Settings') {
+    CRM_Core_Region::instance('contribute-form-contributionpage-settings-main')->add(array(
+      'template' => __DIR__ . '/templates/CRM/Form/ContributionPageCustom.tpl',
+    ));
   }
 }
 
