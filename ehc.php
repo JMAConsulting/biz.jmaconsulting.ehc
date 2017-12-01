@@ -133,10 +133,13 @@ function ehc_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 function ehc_civicrm_preProcess($formName, &$form) {
   if ($formName == 'CRM_Contribute_Form_ContributionPage_Settings') {
     $form->assign('customDataType', 'ContributionPage');
+    $id = $form->getVar('_id');
+    if ($id) {
+      $form->assign('entityID', $id);
+    }
     if (!empty($_POST['hidden_custom'])) {
       $form->set('type', 'ContributionPage');
-
-      CRM_Custom_Form_CustomData::preProcess($form, NULL, NULL, 1, 'ContributionPage', $form->getVar('_id'));
+      CRM_Custom_Form_CustomData::preProcess($form, NULL, NULL, 1, 'ContributionPage', $id);
       CRM_Custom_Form_CustomData::buildQuickForm($form);
       CRM_Custom_Form_CustomData::setDefaultValues($form);
     }
