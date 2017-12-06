@@ -18,3 +18,11 @@
 h1 {
   text-align: center;
 }
+
+.other_amount-section {
+  float: right;
+  margin-top: -40px;
+  margin-right: 185px;
+  display: block;
+}
+

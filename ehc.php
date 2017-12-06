@@ -178,6 +178,12 @@ function ehc_civicrm_postProcess($formName, &$form) {
 }
 
 function ehc_civicrm_buildForm($formName, &$form) {
+  if (in_array($formName, array("CRM_Contribute_Form_Contribution_Main", "CRM_Event_Form_Registration_Register"))) {
+    CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.ehc', 'templates/css/dpo.css', 0, 'html-header');
+    if ($formName == 'CRM_Contribute_Form_Contribution_Main' && in_array($form->_id, array(4,5,6))) {
+      CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
+    }
+  }
   if (in_array(
     $formName,
     array(
@@ -213,12 +219,6 @@ function ehc_civicrm_buildForm($formName, &$form) {
     CRM_Core_Region::instance('contribute-form-contributionpage-settings-main')->add(array(
       'template' => __DIR__ . '/templates/CRM/Form/ContributionPageCustom.tpl',
     ));
-  }
-  if (in_array($formName, array("CRM_Contribute_Form_Contribution_Main", "CRM_Event_Form_Registration_Register"))) {
-    CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.ehc', 'templates/css/dpo.css', 0, 'html-header');
-    if ($formName == 'CRM_Contribute_Form_Contribution_Main' && in_array($form->_id, array(4,5,6))) {
-      CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
-    }
   }
 }
 
