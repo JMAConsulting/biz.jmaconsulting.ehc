@@ -1,0 +1,20 @@
+#wrapper #center-content {
+  width: 100% !important;
+}
+
+#right {
+  display: none;
+}
+
+.price-set-option-content {
+  margin-right: 5px;
+}
+.crm-container fieldset legend {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 26px !important;
+  color: #666666 !important;
+}
+
+h1 {
+  text-align: center;
+}

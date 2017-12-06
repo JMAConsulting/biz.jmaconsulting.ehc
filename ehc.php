@@ -146,6 +146,28 @@ function ehc_civicrm_preProcess($formName, &$form) {
   }
 }
 
+/**
+ * Implements hook_civicrm_alterSettingsFolders().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
+ */
+function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  if ($op == "create" && $objectName == "Contribution") {
+    $contribution = civicrm_api3('Contribution', 'getsingle', array(
+      'return' => array("financial_type_id", "non_deductible_amount"),
+      'id' => $objectId,
+    ));
+    $org = civicrm_api3('EntityFinancialAccount', 'getsingle', array(
+      'return' => array("financial_account_id.contact_id.legal_name", "financial_account_id.contact_id.organization_name"),
+      'entity_table' => "civicrm_financial_type",
+      'entity_id' => $contribution["financial_type_id"],
+      'options' => array('limit' => 1),
+    ));
+    CRM_Core_Smarty::singleton()->assign("financialorg", $org["financial_account_id.contact_id.legal_name"]);
+    CRM_Core_Smarty::singleton()->assign("nondeductibleamount", $contribution['non_deductible_amount']);
+  }
+}
+
 function ehc_civicrm_postProcess($formName, &$form) {
   if ($formName == 'CRM_Contribute_Form_ContributionPage_Settings' && ($id = $form->getVar('_id'))) {
     $customValues = CRM_Core_BAO_CustomField::postProcess($form->_submitValues, $id, 'ContributionPage');
@@ -191,6 +213,12 @@ function ehc_civicrm_buildForm($formName, &$form) {
     CRM_Core_Region::instance('contribute-form-contributionpage-settings-main')->add(array(
       'template' => __DIR__ . '/templates/CRM/Form/ContributionPageCustom.tpl',
     ));
+  }
+  if (in_array($formName, array("CRM_Contribute_Form_Contribution_Main", "CRM_Event_Form_Registration_Register"))) {
+    CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.ehc', 'templates/css/dpo.css', 0, 'html-header');
+    if ($formName == 'CRM_Contribute_Form_Contribution_Main' && in_array($form->_id, array(4,5,6))) {
+      CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
+    }
   }
 }
 
