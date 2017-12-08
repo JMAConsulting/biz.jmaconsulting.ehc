@@ -31,7 +31,7 @@ font-weight: bold !important;
     font-size: 15px !important;
     font-weight: bold !important;
     text-transform: none !important;
-    margin-top: 2em;
+    margin-top: 1px !important;
 }
 
 .other_amount-section {
@@ -55,3 +55,8 @@ font-weight: bold !important;
 #crm-container.crm-public .label, #crm-container.crm-public .price-field-amount {
   font-size: 13px !important;
 }
+
+.crm-container div.form-item {
+  padding: 3px 0 0px 0 !important;
+}
+
