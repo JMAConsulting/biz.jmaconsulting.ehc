@@ -2,6 +2,10 @@
   width: 100% !important;
 }
 
+#crm-container.crm-public .content {
+padding-top: 3px !important;
+}
+
 #right {
   display: none;
 }
@@ -9,14 +13,25 @@
 .price-set-option-content {
   margin-right: 5px;
 }
-.crm-container fieldset legend {
+
+#crm-container fieldset legend {
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 26px !important;
-  color: #666666 !important;
+  font-size: 16px !important;
+  color: #19636B !important;
 }
 
 h1 {
+font-size: 2em !important;
+font-weight: bold !important;
   text-align: center;
+}
+
+#main #center-content h2 {
+    color: #1D929F !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    text-transform: none !important;
+    margin-top: 2em;
 }
 
 .other_amount-section {
