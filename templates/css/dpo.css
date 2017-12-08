@@ -36,3 +36,7 @@ h1 {
   vertical-align: middle;
   max-width: 100%;
 }
+
+#crm-container.crm-public .label, #crm-container.crm-public .price-field-amount {
+  font-size: 13px !important;
+}
