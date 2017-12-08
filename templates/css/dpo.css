@@ -26,3 +26,13 @@ h1 {
   display: block;
 }
 
+#crm-container.crm-public input[type="text"],
+#crm-container.crm-public input[type="password"],
+#crm-container.crm-public input[type="email"],
+#crm-container.crm-public select {
+  font-size: 10px !important;
+  padding: 5px;
+  border-radius: 3px;
+  vertical-align: middle;
+  max-width: 100%;
+}
