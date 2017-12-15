@@ -17,12 +17,12 @@ Class CRM_SALTA_Import {
   }
 
   function createActivitiesFromTags() {
-    $mappingsOptionGroupName = 'SALTA Tag-Activity import mappings';
+    $mappingsOptionGroupName = 'SALTA_Tag-Activity_import_mappings';
     $mappingsOptionGroupValues = CRM_Core_DAO::executeQuery("
       SELECT cv.label, cv.value, cv.description
       FROM civicrm_option_value cv
         INNER JOIN civicrm_option_group cg ON cv.option_group_id = cg.id
-          AND cg.name = {$mappingsOptionGroupName}
+          AND cg.name = '{$mappingsOptionGroupName}'
       "
     );
     // create activity type SALTA
@@ -48,7 +48,8 @@ Class CRM_SALTA_Import {
       $result = civicrm_api3('EntityTag', 'get', [
         'return' => ["entity_id", "tag_id"],
         'entity_table' => "civicrm_contact",
-        'tag_id.name' => $mappingsOptionGroupValues->value,
+        'tag_id.name' => $mappingsOptionGroupValues->label,
+        'options' => ['limit' => 0],
       ]);
       $activityDate = $this->buildDate($mappingsOptionGroupValues->description);
       foreach ($result['values'] as $value) {
@@ -63,7 +64,7 @@ Class CRM_SALTA_Import {
         catch (CiviCRM_API3_Exception $e) {
           $activityParams = [
             'activity_type_id' => $activityTypeName,
-            'subject' => $mappingsOptionGroupValues->label,
+            'subject' => $mappingsOptionGroupValues->value,
             'source_record_id' => $value['tag_id'],
             'activity_date_time' => $activityDate,
             'status_id' => 'Completed',
@@ -93,11 +94,13 @@ Class CRM_SALTA_Import {
   * Build Date using string.
   */
   protected function buildDate($dateString) {
+    $dateString = strip_tags($dateString);
     $dateString = trim($dateString);
     if (strlen($dateString) == 4) {
       $dateString = '01-01-' . $dateString;
     }
     $date = date('Ymd', strtotime($dateString));
+    return $date;
   }
 
 }
