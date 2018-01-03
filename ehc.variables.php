@@ -1,0 +1,3 @@
+<?php
+define('PREMIUM_CONTRIBUTION_PAGE', 7);
+define('CF_ACTIVITY_TYPE', 66);

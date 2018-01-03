@@ -1,7 +1,7 @@
 <?php
 
 require_once 'ehc.civix.php';
-define('PREMIUM_CONTRIBUTION_PAGE', 7);
+require_once 'ehc.variables.php';
 /**
  * Implements hook_civicrm_config().
  *
@@ -169,6 +169,24 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 }
 
 function ehc_civicrm_postProcess($formName, &$form) {
+  if (in_array($formName, array(
+      'CRM_Contribute_Form_Contribution_Confirm',
+      'CRM_Event_Form_Registration_Confirm',
+      'CRM_Campaign_Form_Petition_Signature'
+    )
+  )) {
+    $contactID = (!empty($form->_contactID)) ? $form->_contactID : (!empty($form->_contactId)) ? $form->_contactId : NULL;
+    if ($formName == 'CRM_Event_Form_Registration_Confirm') {
+      $contactID = CRM_Utils_Array::value('contactID', $form->getVar('_params'));
+    }
+    if ($contactID && CRM_Utils_Array::value('custom_' . CF_ACTIVITY_TYPE, $form->_submitValues)) {
+      civicrm_api3('Activity', 'create', array(
+        'activity_type_id' => $form->_submitValues['custom_' . CF_ACTIVITY_TYPE],
+        'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
+        'target_contact_id' => $contactID,
+      ));
+    }
+  }
   if ($formName == 'CRM_Contribute_Form_ContributionPage_Settings' && ($id = $form->getVar('_id'))) {
     $customValues = CRM_Core_BAO_CustomField::postProcess($form->_submitValues, $id, 'ContributionPage');
     if (!empty($customValues) && is_array($customValues)) {
