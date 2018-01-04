@@ -146,6 +146,26 @@ function ehc_civicrm_preProcess($formName, &$form) {
   }
 }
 
+function getCustomColumnsByEntity($entity, $getID = FALSE) {
+  $customColumns = array();
+  $dao = CRM_Core_DAO::executeQuery(
+    "SELECT table_name, column_name, cf.id as cfid FROM civicrm_custom_group cg
+   INNER JOIN civicrm_custom_field cf ON cf.custom_group_id = cg.id
+   WHERE cg.extends = '{$entity}' AND (LOWER(cf.name) LIKE '%solicit_code%' OR LOWER(cf.name) LIKE '%sub_solicit_code%')
+   "
+  );
+  while ($dao->fetch()) {
+    $type = strstr($dao->column_name, 'sub_solicit_code') ? 'ssc' : 'sc';
+    if ($getID) {
+      $customColumns[$entity][$type] = $dao->cfid;
+    }
+    else {
+      $customColumns[$dao->table_name][$type] = $dao->column_name;
+    }
+  }
+  return $customColumns;
+}
+
 /**
  * Implements hook_civicrm_alterSettingsFolders().
  *
@@ -157,11 +177,11 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
       $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'event columns');
       $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
       if (!$customColumns) {
-        $customColumns = self::getCustomColumnsByEntity('Event');
+        $customColumns = getCustomColumnsByEntity('Event');
         CRM_Core_BAO_Cache::setItem($customColumns, 'ehc custom columns', 'event columns');
       }
       if (!$contriCustomIDs) {
-        $contriCustomIDs = self::getCustomColumnsByEntity('Contribution', TRUE);
+        $contriCustomIDs = getCustomColumnsByEntity('Contribution', TRUE);
         CRM_Core_BAO_Cache::setItem($contriCustomIDs, 'ehc custom columns', 'contribution columns');
       }
       if (!empty($customColumns) && !empty($contriCustomIDs)) {
@@ -195,11 +215,11 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
         $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution-page columns');
         $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
         if (!$customColumns) {
-          $customColumns = self::getCustomColumnsByEntity('contribution-page');
+          $customColumns = getCustomColumnsByEntity('ContributionPage');
           CRM_Core_BAO_Cache::setItem($customColumns, 'ehc custom columns', 'contribution-page columns');
         }
         if (!$contriCustomIDs) {
-          $contriCustomIDs = self::getCustomColumnsByEntity('Contribution', TRUE);
+          $contriCustomIDs = getCustomColumnsByEntity('Contribution', TRUE);
           CRM_Core_BAO_Cache::setItem($contriCustomIDs, 'ehc custom columns', 'contribution columns');
         }
         if (!empty($customColumns) && !empty($contriCustomIDs)) {
