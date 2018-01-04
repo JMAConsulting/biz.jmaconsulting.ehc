@@ -151,11 +151,11 @@ function getCustomColumnsByEntity($entity, $getID = FALSE) {
   $dao = CRM_Core_DAO::executeQuery(
     "SELECT table_name, column_name, cf.id as cfid FROM civicrm_custom_group cg
    INNER JOIN civicrm_custom_field cf ON cf.custom_group_id = cg.id
-   WHERE cg.extends = '{$entity}' AND (LOWER(cf.name) LIKE '%solicit_code%' OR LOWER(cf.name) LIKE '%sub_solicit_code%')
+   WHERE cg.extends = '{$entity}' AND (LOWER(cf.name) LIKE '%solicit_code%' OR LOWER(cf.name) LIKE '%sub_solicit%')
    "
   );
   while ($dao->fetch()) {
-    $type = strstr($dao->column_name, 'sub_solicit_code') ? 'ssc' : 'sc';
+    $type = strstr($dao->column_name, 'sub_solicit') ? 'ssc' : 'sc';
     if ($getID) {
       $customColumns[$entity][$type] = $dao->cfid;
     }
@@ -191,8 +191,11 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
         $params = array('id' => $objectRef->contribution_id);
         foreach ($result as $value) {
           foreach ($customColumns as $tableName => $keys) {
-            $params['custom_' . $contriCustomIDs['Contribution']['sc']] = $value[$keys['sc']];
-            $params['custom_' . $contriCustomIDs['Contribution']['ssc']] = $value[$keys['ssc']];
+            foreach (array('sc', 'ssc') as $type) {
+              if (!empty($contriCustomIDs['Contribution'][$type]) && !empty($value[$keys[$type]])) {
+                $params['custom_' . $contriCustomIDs['Contribution'][$type]] = $value[$keys[$type]];
+              }
+            }
           }
         }
         civicrm_api3('Contribution', 'create', $params);
