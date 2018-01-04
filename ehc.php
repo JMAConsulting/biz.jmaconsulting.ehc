@@ -152,19 +152,70 @@ function ehc_civicrm_preProcess($formName, &$form) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
 function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($op == "create" && $objectName == "Contribution") {
-    $contribution = civicrm_api3('Contribution', 'getsingle', array(
-      'return' => array("financial_type_id", "non_deductible_amount"),
-      'id' => $objectId,
-    ));
-    $org = civicrm_api3('EntityFinancialAccount', 'getsingle', array(
-      'return' => array("financial_account_id.contact_id.legal_name", "financial_account_id.contact_id.organization_name"),
-      'entity_table' => "civicrm_financial_type",
-      'entity_id' => $contribution["financial_type_id"],
-      'options' => array('limit' => 1),
-    ));
-    CRM_Core_Smarty::singleton()->assign("financialorg", $org["financial_account_id.contact_id.legal_name"]);
-    CRM_Core_Smarty::singleton()->assign("nondeductibleamount", $contribution['non_deductible_amount']);
+  if ($op == 'create') {
+    if ($objectName == 'ParticipantPayment') {
+      $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'event columns');
+      $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
+      if (!$customColumns) {
+        $customColumns = self::getCustomColumnsByEntity('Event');
+        CRM_Core_BAO_Cache::setItem($customColumns, 'ehc custom columns', 'event columns');
+      }
+      if (!$contriCustomIDs) {
+        $contriCustomIDs = self::getCustomColumnsByEntity('Contribution', TRUE);
+        CRM_Core_BAO_Cache::setItem($contriCustomIDs, 'ehc custom columns', 'contribution columns');
+      }
+      if (!empty($customColumns) && !empty($contriCustomIDs)) {
+        $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $objectRef->participant_id, 'event_id');
+        $tablename = key($customColumns);
+        $result = CRM_Core_DAO::executeQuery(sprintf(" SELECT %s FROM %s WHERE entity_id = %d ",implode(',', $customColumns[$tablename]), $tablename, $eventID))->fetchAll();
+        $params = array('id' => $objectRef->contribution_id);
+        foreach ($result as $value) {
+          foreach ($customColumns as $tableName => $keys) {
+            $params['custom_' . $contriCustomIDs['Contribution']['sc']] = $value[$keys['sc']];
+            $params['custom_' . $contriCustomIDs['Contribution']['ssc']] = $value[$keys['ssc']];
+          }
+        }
+        civicrm_api3('Contribution', 'create', $params);
+      }
+    }
+    if ($objectName == "Contribution") {
+      $contribution = civicrm_api3('Contribution', 'getsingle', array(
+        'return' => array("financial_type_id", "non_deductible_amount"),
+        'id' => $objectId,
+      ));
+      $org = civicrm_api3('EntityFinancialAccount', 'getsingle', array(
+        'return' => array("financial_account_id.contact_id.legal_name", "financial_account_id.contact_id.organization_name"),
+        'entity_table' => "civicrm_financial_type",
+        'entity_id' => $contribution["financial_type_id"],
+        'options' => array('limit' => 1),
+      ));
+      CRM_Core_Smarty::singleton()->assign("financialorg", $org["financial_account_id.contact_id.legal_name"]);
+      CRM_Core_Smarty::singleton()->assign("nondeductibleamount", $contribution['non_deductible_amount']);
+      if (!empty($objectRef->contribution_page_id)) {
+        $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution-page columns');
+        $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
+        if (!$customColumns) {
+          $customColumns = self::getCustomColumnsByEntity('contribution-page');
+          CRM_Core_BAO_Cache::setItem($customColumns, 'ehc custom columns', 'contribution-page columns');
+        }
+        if (!$contriCustomIDs) {
+          $contriCustomIDs = self::getCustomColumnsByEntity('Contribution', TRUE);
+          CRM_Core_BAO_Cache::setItem($contriCustomIDs, 'ehc custom columns', 'contribution columns');
+        }
+        if (!empty($customColumns) && !empty($contriCustomIDs)) {
+          $tablename = key($customColumns);
+          $result = CRM_Core_DAO::executeQuery(sprintf(" SELECT %s FROM %s WHERE entity_id = %d ",implode(',', $customColumns[$tablename]), $tablename, $objectRef->contribution_page_id))->fetchAll();
+          $params = array('id' => $objectRef->id);
+          foreach ($result as $value) {
+            foreach ($customColumns as $tableName => $keys) {
+              $params['custom_' . $contriCustomIDs['Contribution']['sc']] = $value[$keys['sc']];
+              $params['custom_' . $contriCustomIDs['Contribution']['ssc']] = $value[$keys['ssc']];
+            }
+          }
+          civicrm_api3('Contribution', 'create', $params);
+        }
+      }
+    }
   }
 }
 
