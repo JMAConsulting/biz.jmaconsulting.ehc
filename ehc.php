@@ -258,7 +258,6 @@ function ehc_civicrm_postProcess($formName, &$form) {
     if ($contactID && $activityType) {
       civicrm_api3('Activity', 'create', array(
         'activity_type_id' => $activityType,
-        'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
         'target_contact_id' => $contactID,
       ));
     }
