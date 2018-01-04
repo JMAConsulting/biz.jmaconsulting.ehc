@@ -250,12 +250,14 @@ function ehc_civicrm_postProcess($formName, &$form) {
     )
   )) {
     $contactID = (!empty($form->_contactID)) ? $form->_contactID : (!empty($form->_contactId)) ? $form->_contactId : NULL;
+    $activityType = CRM_Utils_Array::value('custom_' . CF_ACTIVITY_TYPE, $form->_submitValues);
     if ($formName == 'CRM_Event_Form_Registration_Confirm') {
       $contactID = CRM_Utils_Array::value('contactID', $form->getVar('_params'));
+      $activityType = CRM_Utils_Array::value('custom_' . CF_ACTIVITY_TYPE, $form->getVar('_params'));
     }
-    if ($contactID && CRM_Utils_Array::value('custom_' . CF_ACTIVITY_TYPE, $form->_submitValues)) {
+    if ($contactID && $activityType) {
       civicrm_api3('Activity', 'create', array(
-        'activity_type_id' => $form->_submitValues['custom_' . CF_ACTIVITY_TYPE],
+        'activity_type_id' => $activityType,
         'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
         'target_contact_id' => $contactID,
       ));
