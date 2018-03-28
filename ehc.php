@@ -249,16 +249,19 @@ function ehc_civicrm_postProcess($formName, &$form) {
       'CRM_Campaign_Form_Petition_Signature'
     )
   )) {
-    $contactID = (!empty($form->_contactID)) ? $form->_contactID : (!empty($form->_contactId)) ? $form->_contactId : NULL;
+    $contactID = (!empty($form->_contactID)) ? $form->_contactID : ((!empty($form->_contactId)) ? $form->_contactId : NULL);
     $activityType = CRM_Utils_Array::value('custom_' . CF_ACTIVITY_TYPE, $form->_submitValues);
     if ($formName == 'CRM_Event_Form_Registration_Confirm') {
       $contactID = CRM_Utils_Array::value('contactID', $form->getVar('_params'));
       $activityType = CRM_Utils_Array::value('custom_' . CF_ACTIVITY_TYPE, $form->getVar('_params'));
     }
+
     if ($contactID && $activityType) {
+     $domainId = CRM_Core_Config::domainID();
       civicrm_api3('Activity', 'create', array(
         'activity_type_id' => $activityType,
         'target_contact_id' => $contactID,
+	'source_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
       ));
     }
   }

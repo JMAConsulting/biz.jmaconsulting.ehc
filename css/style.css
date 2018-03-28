@@ -1,3 +1,97 @@
 #crm-container .disabled {
   opacity : 1 !important;
 }
+
+#right {
+  display: none;
+}
+
+#wrapper #center-content {
+  width: 100% !important;
+}
+
+#crm-container.crm-public .content {
+padding-top: 3px !important;
+}
+
+@media screen and (max-device-width: 480px) {
+
+  .crm-container .crm-section .content {
+    margin-left: 0 !important;
+  }
+
+  .ui-page-theme-a .ui-body-inherit {
+    background-color: none !important;
+    border-color: none !important;
+    text-shadow: none !important;
+  }
+
+  .ui-shadow-inset {
+    width: 20em;
+  }
+  
+  .crm-container .huge, input.crm-form-entityref {
+    width: 20em;
+  }
+
+  .crm-button {
+    background: none !important;
+    border: none !important;
+  }  
+
+  .crm-container a.button, .crm-container a.button:link {
+    background-color: #f6f6f6 !important;
+    background: none !important;
+    border-color: #ddd !important;
+    color: #333 !important;
+    text-shadow: 0 1px 0 #f3f3f3 !important;
+    font-size: 16px;
+    margin: .5em 0;
+    padding: .7em 1em;
+    display: block;
+    position: relative;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    font-weight: bold;
+  } 
+
+  input {
+    float: left;
+    width: 20em !important;
+  }
+
+  .label {
+    position: relative;
+    top: 17px;
+    margin-right: 10px;
+  }
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  input[type="checkbox"] {
+    display: none;
+  }
+
+  .other_amount-content {
+    margin-top: 15px;
+  }
+
+  .is_recur-section {
+    margin-top: 15px;
+    float: left;
+  }
+
+  fieldset.honor_block-group {
+    margin: 160px 0 !important;
+  }
+
+}
