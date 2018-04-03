@@ -197,9 +197,15 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
       // add to joomla user role 'SALTA'
       jimport('joomla.user.helper');
       $userObj = JFactory::getUser($objectRef->uf_id);
-      $params = array('groups' => array(SALTA_USER_ROLE_ID));
+      $params = array('groups' => array(SALTA_USER_ROLE_ID), 'block' => 1);
       $userObj->bind($params);
       $userObj->save();
+
+      $SALTATemplateID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_MessageTemplate', 'SALTA Signup welcome template', 'id', 'msg_title');
+      civicrm_api3('Email', 'send', array(
+        'contact_id' => $objectRef->contact_id,
+        'template_id' => $SALTATemplateID,
+      ));
     }
     if ($objectName == 'ParticipantPayment') {
       $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'event columns');
