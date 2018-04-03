@@ -167,8 +167,8 @@ function getCustomColumnsByEntity($entity, $getID = FALSE) {
 }
 
 function ehc_civicrm_pre($op, $objectName, $id, &$params) {
-  if (!empty($params['cms_name']) && $objectName == 'Individual' && $op == 'create') {
-    $parts = explode(' ', ucwords($params['cms_name']));
+  if (!empty($params['cms_create_account']) && $objectName == 'Individual' && $op == 'create') {
+    $parts = explode(' ', ucwords($params['first_name']));
     $params['first_name'] = CRM_Utils_Array::value(0, $parts);
     if (count($parts) >= 3) {
       $params['last_name'] = end($parts);
@@ -187,6 +187,20 @@ function ehc_civicrm_pre($op, $objectName, $id, &$params) {
  */
 function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($op == 'create') {
+    if ($objectName == 'UFMatch') {
+      civicrm_api3('Activity', 'create', array(
+        'activity_type_id' => 'SALTA Signup',
+        'target_contact_id' => $objectRef->contact_id,
+	      'source_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $objectRef->domain_id, 'contact_id'),
+      ));
+
+      // add to joomla user role 'SALTA'
+      jimport('joomla.user.helper');
+      $userObj = JFactory::getUser($objectRef->uf_id);
+      $params = array('groups' => array(SALTA_USER_ROLE_ID));
+      $userObj->bind($params);
+      $userObj->save();
+    }
     if ($objectName == 'ParticipantPayment') {
       $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'event columns');
       $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
@@ -275,7 +289,7 @@ function ehc_civicrm_postProcess($formName, &$form) {
       civicrm_api3('Activity', 'create', array(
         'activity_type_id' => $activityType,
         'target_contact_id' => $contactID,
-	'source_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
+	       'source_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
       ));
     }
   }
