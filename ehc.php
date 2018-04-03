@@ -187,26 +187,6 @@ function ehc_civicrm_pre($op, $objectName, $id, &$params) {
  */
 function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($op == 'create') {
-    if ($objectName == 'UFMatch') {
-      civicrm_api3('Activity', 'create', array(
-        'activity_type_id' => 'SALTA Signup',
-        'target_contact_id' => $objectRef->contact_id,
-	      'source_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $objectRef->domain_id, 'contact_id'),
-      ));
-
-      // add to joomla user role 'SALTA'
-      jimport('joomla.user.helper');
-      $userObj = JFactory::getUser($objectRef->uf_id);
-      $params = array('groups' => array(SALTA_USER_ROLE_ID), 'block' => 1);
-      $userObj->bind($params);
-      $userObj->save();
-
-      $SALTATemplateID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_MessageTemplate', 'SALTA Signup welcome template', 'id', 'msg_title');
-      civicrm_api3('Email', 'send', array(
-        'contact_id' => $objectRef->contact_id,
-        'template_id' => $SALTATemplateID,
-      ));
-    }
     if ($objectName == 'ParticipantPayment') {
       $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'event columns');
       $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
@@ -277,6 +257,44 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 }
 
 function ehc_civicrm_postProcess($formName, &$form) {
+  $domainId = CRM_Core_Config::domainID();
+  if ($formName == 'CRM_Profile_Form_Edit') {
+    $contactID = $form->getVar('_id');
+    $profileID = $form->getVar('_gid');
+    $userID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $contactID, 'uf_id', 'contact_id');
+    $matchingParams = array(
+      SALTA_SIGNUP_PROFILE_ID => array(
+        'role' => SALTA_USER_ROLE_ID,
+        'template' => 'SALTA Signup welcome template',
+        'activity_type' => 'SALTA Signup',
+      ),
+      HN_SIGNUP_PROFILE_ID => array(
+        'role' => HN_USER_ROLE_ID,
+        'template' => 'Healthy NeighBourhoods Signup welcome template',
+        'activity_type' => 'Healthy Neighbourhoods Signup',
+      ),
+    );
+    if (array_key_exists($profileID, $matchingParams)) {
+      civicrm_api3('Activity', 'create', array(
+        'activity_type_id' => $matchingParams[$profileID]['activity_type'],
+        'target_contact_id' => $contactID,
+        'source_contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
+      ));
+
+      // add to joomla user role
+      jimport('joomla.user.helper');
+      $userObj = JFactory::getUser($userID);
+      $params = array('groups' => array($matchingParams[$profileID]['role']), 'block' => 1);
+      $userObj->bind($params);
+      $userObj->save();
+
+      $SALTATemplateID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_MessageTemplate', $matchingParams[$profileID]['template'], 'id', 'msg_title');
+      civicrm_api3('Email', 'send', array(
+        'contact_id' => $contactID,
+        'template_id' => $SALTATemplateID,
+      ));
+    }
+  }
   if (in_array($formName, array(
       'CRM_Contribute_Form_Contribution_Confirm',
       'CRM_Event_Form_Registration_Confirm',
@@ -291,7 +309,6 @@ function ehc_civicrm_postProcess($formName, &$form) {
     }
 
     if ($contactID && $activityType) {
-     $domainId = CRM_Core_Config::domainID();
       civicrm_api3('Activity', 'create', array(
         'activity_type_id' => $activityType,
         'target_contact_id' => $contactID,
@@ -349,6 +366,9 @@ function ehc_civicrm_buildForm($formName, &$form) {
     CRM_Core_Region::instance('contribute-form-contributionpage-settings-main')->add(array(
       'template' => __DIR__ . '/templates/CRM/Form/ContributionPageCustom.tpl',
     ));
+  }
+  elseif ($formName == 'CRM_Profile_Form_Edit') {
+    CRM_Core_Resources::singleton()->addStyle('#editrow-custom_267 .label { display: none; }');
   }
 }
 
