@@ -1,7 +1,6 @@
 <?php
 define('PREMIUM_CONTRIBUTION_PAGE', 7);
 define('CF_ACTIVITY_TYPE', 66);
-define('CF_ACTIVITY_TYPE', 66);
 define('SALTA_USER_ROLE_ID', 9);
 define('HN_USER_ROLE_ID', 10);
 define('SALTA_SIGNUP_PROFILE_ID', 54);

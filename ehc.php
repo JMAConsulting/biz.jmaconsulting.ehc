@@ -166,20 +166,6 @@ function getCustomColumnsByEntity($entity, $getID = FALSE) {
   return $customColumns;
 }
 
-function ehc_civicrm_pre($op, $objectName, $id, &$params) {
-  if (!empty($params['cms_create_account']) && $objectName == 'Individual' && $op == 'create') {
-    $parts = explode(' ', ucwords($params['first_name']));
-    $params['first_name'] = CRM_Utils_Array::value(0, $parts);
-    if (count($parts) >= 3) {
-      $params['last_name'] = end($parts);
-      $params['middle_name'] = str_replace(array($params['first_name'], $params['last_name']), '', implode(' ', $parts));
-    }
-    else {
-      $params['last_name'] = CRM_Utils_Array::value(1, $parts);
-    }
-  }
-}
-
 /**
  * Implements hook_civicrm_alterSettingsFolders().
  *
