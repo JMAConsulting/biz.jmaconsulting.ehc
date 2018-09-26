@@ -379,3 +379,20 @@ function ehc_civicrm_alterMailParams(&$params, $context){
     $params['tplParams'] = $tplParams;
   }
 }
+
+function ehc_civicrm_alterReportVar($varType, &$var, &$object) {
+  // Donation report
+  if ($varType == 'columns' && get_class($object) == 'CRM_Report_Form_Contribute_Detail') {
+    $var['civicrm_contribution']['fields'] += array(
+      'contribution_recur_id' => array(
+        'title' => ts('Recurring Contribution?'),
+        'dbAlias' => 'IF (contribution_recur_id, "Recurring", "")',
+      ),
+    );
+    $var['civicrm_contribution']['filters'] += array(
+      'contribution_recur_id' => array(
+        'title' => ts('Recurring Contributions'),
+      ),
+    );
+  }
+}
