@@ -227,7 +227,15 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
         }
         if (!empty($customColumns) && !empty($contriCustomIDs)) {
           $tablename = key($customColumns);
-          $result = CRM_Core_DAO::executeQuery(sprintf(" SELECT %s FROM %s WHERE entity_id = %d ",implode(',', $customColumns[$tablename]), $tablename, $objectRef->contribution_page_id))->fetchAll();
+          // First check if solicit and sub solicit set in Recurring Profile.
+          if (!empty($objectRef->contribution_recur_id)) {
+            $customColumns = getCustomColumnsByEntity('ContributionRecur');
+            $tablename = key($customColumns);
+            $result = CRM_Core_DAO::executeQuery(sprintf("SELECT %s FROM %s WHERE entity_id = %d ",implode(',', $customColumns[$tablename]), $tablename, $objectRef->contribution_recur_id))->fetchAll();
+          }
+          if (empty($result)) {
+            $result = CRM_Core_DAO::executeQuery(sprintf("SELECT %s FROM %s WHERE entity_id = %d ",implode(',', $customColumns[$tablename]), $tablename, $objectRef->contribution_page_id))->fetchAll();
+          }
           $params = array('id' => $objectRef->id);
           foreach ($result as $value) {
             foreach ($customColumns as $tableName => $keys) {
