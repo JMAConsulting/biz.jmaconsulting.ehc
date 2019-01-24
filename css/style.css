@@ -62,9 +62,10 @@ padding-top: 3px !important;
     font-weight: bold;
   } 
 
+/*
   input {
-    float: left;
-    width: 20em !important;
+   // float: left;
+   // width: 20em !important;
   }
 
   .label {
@@ -74,24 +75,27 @@ padding-top: 3px !important;
   }
 
   input[type="radio"] {
-    display: none;
+   /* display: none; 
   }
 
   input[type="checkbox"] {
-    display: none;
+  //  display: none;
   }
 
   .other_amount-content {
-    margin-top: 15px;
+   // margin-top: 15px;
   }
 
   .is_recur-section {
-    margin-top: 15px;
-    float: left;
+   // margin-top: 15px;
+   // float: left;
   }
 
   fieldset.honor_block-group {
-    margin: 160px 0 !important;
+   // margin: 160px 0 !important;
   }
 
+*/
+
 }
+
