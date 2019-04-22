@@ -382,11 +382,25 @@ function ehc_civicrm_postProcess($formName, &$form) {
   }
 }
 
+function ehc_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+  if ($formName == "CRM_Event_Form_Registration_Register" && $form->_eventId == 215) {
+    if (empty($fields['price_30']) && empty($fields['price_32']) && empty($fields['price_34']) && empty($fields['price_35']) && empty($fields['price_52']) && empty($fields['price_53'])) {
+      $errors['first_name'] = ts('Please select atleast one ticket from the options below');
+    }
+  }
+}
+
 function ehc_civicrm_buildForm($formName, &$form) {
   if (in_array($formName, array("CRM_Contribute_Form_Contribution_Main", "CRM_Event_Form_Registration_Register"))) {
     CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.ehc', 'templates/css/dpo.css', 0, 'html-header');
     if ($formName == 'CRM_Contribute_Form_Contribution_Main' && in_array($form->_id, array(4,5,6))) {
       CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
+    }
+    if ($formName == "CRM_Event_Form_Registration_Register" && $form->_eventId == 215) {
+      $form->add('checkbox', 'split_payment', ts('Would you like to split this payment?'));
+        CRM_Core_Region::instance('page-body')->add(array(
+          'template' => 'CRM/SplitPayment.tpl',
+      ));
     }
   }
   if (in_array(
@@ -525,14 +539,14 @@ function ehc_civicrm_alterReportVar($varType, &$var, &$object) {
       'title' => ts('Last Contribution ID'),
       'dbAlias' => 'last_detail_temp.l_id',
     ];
-    $var['civicrm_contribution']['fields']['secondary_phone'] = [
+/*    $var['civicrm_contribution']['fields']['secondary_phone'] = [
       'title' => ts('Donor Secondary Phone'),
       'dbAlias' => 'p.phone SEPARATOR "<br/>\n"',
-    ];
+    ]; 
     $var['civicrm_contribution']['fields']['secondary_email'] = [
       'title' => ts('Donor Secondary Email'),
       'dbAlias' => 'e.email SEPARATOR "<br/>\n"',
-    ];
+    ]; */
     $var['civicrm_contribution']['fields']['sum_amount'] = [
       'title' => ts('Aggregate Amount'),
       'dbAlias' => 'agg_details_temp.sum_amount',
@@ -616,7 +630,6 @@ CRM_Core_Error::debug('ag', $sql); */
     CRM_Core_DAO::executeQuery($sql);
     $sql = "CREATE TEMPORARY TABLE civireport_contribution_aggregates_temp DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS SELECT c.contact_id, SUM(c.total_amount) as sum_amount, AVG(c.total_amount) as avg_amount, CONCAT('$ ', MAX(total_amount)) as largest_gift_amount, MIN(receive_date) as first_gift_date, COUNT(c.id) as number_of_donations FROM civicrm_contribution c WHERE c.contribution_status_id = 1 GROUP BY c.contact_id";
     CRM_Core_DAO::executeQuery($sql);
-    $sql = "CREATE TEMPORARY TABLE civireport_contribution_fy_temp DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS SELECT c.contact_id, SUM(c.total_amount) as fy_amount FROM civicrm_contribution c WHERE c.contribution_status = 1 AND c.receive_date BETWEEN ";
     $sql = "CREATE TEMPORARY TABLE civireport_contribution_fy_temp DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS SELECT
    CASE WHEN MONTH(receive_date)>=7 THEN
           concat(YEAR(receive_date), '-',YEAR(receive_date)+1)
@@ -655,7 +668,6 @@ GROUP BY contact_id, cal_year";
     $object->setVar('_aclFrom', $aclFrom);
     $object->setFromForLastContribution = $from;
   }
-  
   if ($varType == 'rows' && get_class($object) == 'CRM_Report_Form_Contribute_Detail') {
     $object->setVar('_aclFrom', $object->setACLFromForLastContribution);
     $object->setVar('_from', $object->setFromForLastContribution);
