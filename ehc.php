@@ -432,6 +432,15 @@ function ehc_civicrm_buildForm($formName, &$form) {
   if ($formName == 'CRM_Contribute_Form_Contribution' && $form->getVar('_formType') == 'AdditionalDetail') {
     $form->setDefaults(['contribution_page_id' => 5]);
   }
+  // Sub Activity
+  if ($formName == "CRM_Activity_Form_Activity") {
+    if ($form->_action & CRM_Core_Action::VIEW) {
+      $form->assign('isView', TRUE);
+    }
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/AddSubActivity.tpl',
+    ));
+  }
 }
 
 
