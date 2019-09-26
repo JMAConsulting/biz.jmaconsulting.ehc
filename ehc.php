@@ -384,7 +384,8 @@ function ehc_civicrm_postProcess($formName, &$form) {
 
 function ehc_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   if ($formName == "CRM_Event_Form_Registration_Register" && $form->_eventId == 215) {
-    if (empty($fields['price_30']) && empty($fields['price_32']) && empty($fields['price_34']) && empty($fields['price_35']) && empty($fields['price_52']) && empty($fields['price_53'])) {
+    if (empty($fields['price_30']) && empty($fields['price_32']) && empty($fields['price_34']) && empty($fields['price_35'])) {
+//&& empty($fields['price_52']) && empty($fields['price_53'])) {
       $errors['first_name'] = ts('Please select atleast one ticket from the options below');
     }
   }
@@ -396,12 +397,12 @@ function ehc_civicrm_buildForm($formName, &$form) {
     if ($formName == 'CRM_Contribute_Form_Contribution_Main' && in_array($form->_id, array(4,5,6))) {
       CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
     }
-    if ($formName == "CRM_Event_Form_Registration_Register" && $form->_eventId == 215) {
+    /* if ($formName == "CRM_Event_Form_Registration_Register" && $form->_eventId == 215) {
       $form->add('checkbox', 'split_payment', ts('Would you like to split this payment?'));
         CRM_Core_Region::instance('page-body')->add(array(
           'template' => 'CRM/SplitPayment.tpl',
       ));
-    }
+    } */
   }
   if (in_array(
     $formName,

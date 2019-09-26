@@ -34,10 +34,17 @@ font-weight: bold !important;
     margin-top: 1px !important;
 }
 
-.other_amount-section {
+.crm-contribution-page-id-5 .other_amount-section {
   float: right;
   margin-top: -40px;
   margin-right: 585px;
+  display: block;
+}
+
+.crm-contribution-page-id-6 .other_amount-section { 
+  float: right;
+  margin-top: -34px;
+  margin-right: 156px;
   display: block;
 }
 
