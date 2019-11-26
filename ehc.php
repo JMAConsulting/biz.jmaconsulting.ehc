@@ -458,6 +458,35 @@ function ehc_civicrm_buildForm($formName, &$form) {
   }
 }
 
+function ehc_civicrm_tokens(&$tokens) {
+  $tokens['event'] = array(
+    'event.contact_name' => 'Event Contact - Name',
+    'event.contact_email' => 'Event Contact - Email Address',
+  );
+}
+
+function ehc_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
+  if (!empty($tokens['event'])) {
+    $event = CRM_Core_Smarty::singleton()->get_template_vars('event');
+    if (!empty($event['id'])) {
+      $eventContacts = CRM_Core_DAO::executeQuery("SELECT confirm_from_name, confirm_from_email FROM civicrm_event WHERE id = %1", [1 => [$event['id'], "Integer"]])->fetchAll();
+      if (!empty($eventContacts[0])) {
+        $confirmFromName = $eventContacts[0]['confirm_from_name'];
+        $confirmFromEmail = $eventContacts[0]['confirm_from_email'];
+      }
+      if (empty($confirmFromEmail)) {
+        $confirmFromEmail = "EHC_Action_Alert@environmentalhealth.org";
+      }
+      if (empty($confirmFromName)) {
+        $confirmFromName = "Environmental Health Coalition";
+      }
+      foreach ($cids as $cid) {
+        $values[$cid]['event.contact_name'] = $confirmFromName;
+        $values[$cid]['event.contact_email'] = $confirmFromEmail;
+      }
+    }
+  }
+}
 
 function ehc_civicrm_alterMailParams(&$params, $context){
   if (!empty($params['valueName'])
