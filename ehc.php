@@ -275,7 +275,7 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
               $ftName = CRM_Contribute_PseudoConstant::financialType($objectRef->financial_type_id);
               $sc = CRM_Core_DAO::singleValueQuery("SELECT name FROM civicrm_option_value WHERE value = '" . $values[$keys['sc']] . "' AND option_group_id = 96");
               $ssc = CRM_Core_DAO::singleValueQuery("SELECT name FROM civicrm_option_value WHERE value = '" . $values[$keys['ssc']] . "' AND option_group_id = 97");
-              $params['custom_269'] = getFinanceColumn($ftName, $sc, $ssc); 
+              $params['custom_269'] = getFinanceColumn($ftName, $sc, $ssc);
             }
           }
           civicrm_api3('Contribution', 'create', $params);
@@ -394,6 +394,14 @@ function ehc_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors
 function ehc_civicrm_buildForm($formName, &$form) {
   if (in_array($formName, array("CRM_Contribute_Form_Contribution_Main", "CRM_Event_Form_Registration_Register"))) {
     CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.ehc', 'templates/css/dpo.css', 0, 'html-header');
+    if ($formName == 'CRM_Event_Form_Registration_Register' && in_array($form->_eventId, [215, 216, 217])) {
+      CRM_Core_Resources::singleton()->addScript(
+        "CRM.$(function($) {
+          $('#amount_sum_label').text(ts('Total') + ':');
+        });
+        "
+      );
+    }
     if ($formName == 'CRM_Contribute_Form_Contribution_Main' && in_array($form->_id, array(4,5,6))) {
       CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
     }
@@ -572,7 +580,7 @@ function ehc_civicrm_alterReportVar($varType, &$var, &$object) {
 /*    $var['civicrm_contribution']['fields']['secondary_phone'] = [
       'title' => ts('Donor Secondary Phone'),
       'dbAlias' => 'p.phone SEPARATOR "<br/>\n"',
-    ]; 
+    ];
     $var['civicrm_contribution']['fields']['secondary_email'] = [
       'title' => ts('Donor Secondary Email'),
       'dbAlias' => 'e.email SEPARATOR "<br/>\n"',
@@ -614,11 +622,11 @@ function ehc_civicrm_alterReportVar($varType, &$var, &$object) {
     $where = $object->getVar('_where');
     /* $sql = "CREATE TEMPORARY TABLE civireport_contribution_last_detail_temp DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
     SELECT * FROM (
-    SELECT now.id, last.id as l_id, last.receive_date FROM civicrm_contribution last 
+    SELECT now.id, last.id as l_id, last.receive_date FROM civicrm_contribution last
       LEFT JOIN
         (SELECT contribution_civireport.id, contribution_civireport.contact_id,
           contribution_civireport.receive_date
-         FROM civicrm_contact contact_civireport   
+         FROM civicrm_contact contact_civireport
       INNER JOIN civicrm_contribution contribution_civireport
         ON contact_civireport.id = contribution_civireport.contact_id
         AND contribution_civireport.is_test = 0
@@ -629,7 +637,7 @@ function ehc_civicrm_alterReportVar($varType, &$var, &$object) {
      ) as t
      GROUP BY t.id";
 CRM_Core_Error::debug('ag', $sql); */
-   /* 
+   /*
     $sql = "CREATE TEMPORARY TABLE civireport_contribution_last_detail_temp DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
       SELECT
         contact_id,
@@ -644,7 +652,7 @@ CRM_Core_Error::debug('ag', $sql); */
     $sql = "
     CREATE TEMPORARY TABLE civireport_contribution_last_detail_temp DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
     SELECT * FROM (select @i:=0) as a, (
-      SELECT now.id, last.id as l_id, last.receive_date AS l_receive_date, last.total_amount as l_total_amount, gd.solicit_code_256 AS l_solicit_code, gd.sub_solicit_code_257 AS l_sub_solicit_code, financial_type_id AS l_financial_type_id FROM civicrm_contribution last 
+      SELECT now.id, last.id as l_id, last.receive_date AS l_receive_date, last.total_amount as l_total_amount, gd.solicit_code_256 AS l_solicit_code, gd.sub_solicit_code_257 AS l_sub_solicit_code, financial_type_id AS l_financial_type_id FROM civicrm_contribution last
       LEFT JOIN civicrm_value_dp_gift_details_61 gd ON gd.entity_id = last.id
       LEFT JOIN
         (SELECT contribution_civireport.id, contribution_civireport.contact_id,
@@ -682,9 +690,9 @@ GROUP BY contact_id, cal_year";
       SELECT GROUP_CONCAT(concat(cal_year, ' - $ ', total_amount_sum) SEPARATOR '<br/>\n') as cal_amounts, contact_id FROM civireport_contribution_cal_temp group by contact_id
     ";
     CRM_Core_DAO::executeQuery($sql);
-    
+
     //$_aclFrom = " LEFT JOIN civireport_contribution_last_detail_temp last_detail_temp ON last_detail_temp.contact_id = contribution_civireport.contact_id ";
-    $_aclFrom = " LEFT JOIN civireport_contribution_last_detail_temp last_detail_temp ON last_detail_temp.id = contribution_civireport.id 
+    $_aclFrom = " LEFT JOIN civireport_contribution_last_detail_temp last_detail_temp ON last_detail_temp.id = contribution_civireport.id
       LEFT JOIN civireport_contribution_aggregates_temp agg_details_temp ON agg_details_temp.contact_id = contribution_civireport.contact_id
       LEFT JOIN civireport_contribution_join_temp fy_temp ON fy_temp.contact_id = contribution_civireport.contact_id
       LEFT JOIN civireport_contribution_cal_join_temp cal_temp ON cal_temp.contact_id = contribution_civireport.contact_id ";
@@ -693,7 +701,7 @@ GROUP BY contact_id, cal_year";
     $from .= " LEFT JOIN civicrm_email e ON e.contact_id = contact_civireport.id AND e.is_primary <> 1 AND e.email <> email_civireport.email";
     $object->setACLFromForLastContribution = $object->getVar('_aclFrom');
     $aclFrom = $object->getVar('_aclFrom') . $_aclFrom;
-    
+
     $object->setVar('_from', $from);
     $object->setVar('_aclFrom', $aclFrom);
     $object->setFromForLastContribution = $from;
@@ -716,7 +724,7 @@ GROUP BY contact_id, cal_year";
       }
       if ($value = CRM_Utils_Array::value('civicrm_contribution_last_total_amount', $row)) {
         $var[$key]['civicrm_contribution_last_total_amount'] = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
-      } 
+      }
       if ($value = CRM_Utils_Array::value('civicrm_contribution_sum_amount', $row)) {
         $var[$key]['civicrm_contribution_sum_amount'] = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
       }
@@ -725,5 +733,5 @@ GROUP BY contact_id, cal_year";
       }
     }
   }
-  
+
 }
