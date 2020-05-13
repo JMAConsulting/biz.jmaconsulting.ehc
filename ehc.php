@@ -497,6 +497,9 @@ function ehc_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array()
 }
 
 function ehc_civicrm_alterMailParams(&$params, $context){
+  if (in_array($context, ['civimail', 'flexmailer', 'messageTemplate'])) {
+    $params['html'] = str_replace('https://///','https://',$params['html']);
+  }
   if (!empty($params['valueName'])
     && $params['valueName'] == 'contribution_online_receipt'
     && !empty($params['tplParams']['contributionPageId'])
