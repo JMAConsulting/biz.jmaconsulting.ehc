@@ -701,7 +701,7 @@ GROUP BY contact_id, cal_year";
       LEFT JOIN civireport_contribution_cal_join_temp cal_temp ON cal_temp.contact_id = contribution_civireport.contact_id ";
     $from .= $_aclFrom;
     $from .= " LEFT JOIN civicrm_phone p ON p.contact_id = contact_civireport.id AND p.is_primary <> 1";
-    $from .= " LEFT JOIN civicrm_email e ON e.contact_id = contact_civireport.id AND e.is_primary <> 1 AND e.email <> email_civireport.email";
+    $from .= " LEFT JOIN civicrm_email e ON e.contact_id = contact_civireport.id AND e.is_primary <> 1 " . ($object->isTableSelected('civicrm_email') ? ' AND e.email <> email_civireport.email' : '');
     $object->setACLFromForLastContribution = $object->getVar('_aclFrom');
     $aclFrom = $object->getVar('_aclFrom') . $_aclFrom;
 
