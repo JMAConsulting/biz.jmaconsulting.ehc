@@ -451,9 +451,30 @@ function ehc_civicrm_buildForm($formName, &$form) {
   elseif ($formName == 'CRM_Profile_Form_Edit') {
     CRM_Core_Resources::singleton()->addStyle('#editrow-custom_267 .label { display: none; }');
   }
-
   if ($formName == 'CRM_Contribute_Form_Contribution' && $form->getVar('_formType') == 'AdditionalDetail') {
     $form->setDefaults(['contribution_page_id' => 5]);
+  }
+  if ($formName == 'CRM_Contribute_Form_Contribution') {
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/AddCheckDate.tpl',
+    ));
+  }
+  if ($formName == 'CRM_Contribute_Form_ContributionView') {
+    if ($form->_action & CRM_Core_Action::VIEW) {
+      $contributionId = $form->get('id');
+      $result = civicrm_api3('Contribution', 'get', [
+        'sequential' => 1,
+        'return' => ["custom_279"],
+        'id' => $contributionId,
+      ]);
+      if (!empty($result['values'][0]['custom_279'])) {
+        $checkDate = $result['values'][0]['custom_279'];
+        $form->assign('checkDate', $checkDate);
+      }
+    }
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/ShowCheckDate.tpl',
+    ));
   }
   // Sub Activity
   if ($formName == "CRM_Activity_Form_Activity") {
