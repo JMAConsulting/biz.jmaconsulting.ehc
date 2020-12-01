@@ -419,9 +419,17 @@ function ehc_civicrm_buildForm($formName, &$form) {
         "
       );
     }
-    if ($formName == 'CRM_Contribute_Form_Contribution_Main' && in_array($form->_id, array(4,5,6))) {
-      CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
-    }
+    if ($formName == 'CRM_Contribute_Form_Contribution_Main') {
+      require_once 'Mobile_Detect.php';
+      $detect = new Mobile_Detect;
+      if ($detect->isMobile() || $detect->isTablet()) {
+        CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.ehc', 'css/custom-civicrm.css', -50, 'html-header');
+        $civicrm_css = CRM_Core_Resources::singleton()->getUrl('civicrm', 'css/civicrm.css', TRUE);
+        CRM_Core_Region::instance('html-header')->update($civicrm_css, array('disabled' => TRUE));
+      }
+      if (in_array($form->_id, array(4,5,6))) {
+        CRM_Core_Resources::singleton()->addScriptFile('biz.jmaconsulting.ehc', 'templates/js/dpo.js');
+      }
     /* if ($formName == "CRM_Event_Form_Registration_Register" && $form->_eventId == 215) {
       $form->add('checkbox', 'split_payment', ts('Would you like to split this payment?'));
         CRM_Core_Region::instance('page-body')->add(array(
