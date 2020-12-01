@@ -1,0 +1,127 @@
+#crm-container.crm-public input[type="text"],
+#crm-container.crm-public input[type="password"],
+#crm-container.crm-public input[type="email"],
+#crm-container.crm-public textarea,
+#crm-container.crm-public select {
+  width: 100% !important;
+  font-size: 15px !important;
+  padding: 5px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  resize: vertical !important;
+}
+
+#frequency_unit {
+  width: 10% !important;
+  padding: 12px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+}
+
+.credit_card_info-group input[type=text], .credit_card_info-group select {
+  width: auto !important;
+  padding: 15px !important;
+}
+
+#crm-container fieldset legend {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 1.5em !important;
+  width: auto !important;
+  color: #19636B !important;
+  border-bottom: 0px !important;
+}
+
+label, #priceset, #pricelabel, #crm-main-content-wrapper {
+  font-size: 1.2em !important;
+}
+
+#header_wrapper {
+  background: #dbcddc !important;
+  border-bottom: none !important;
+}
+
+#main-menu a {
+  font-family: "open_sansbold", Helvetica, Arial, sans-serif !important;
+  font-weight: bold;
+}
+
+.page-civicrm, .page-civicrm #page {
+  background: white !important;
+}
+
+.page-civicrm h1.page-title {
+  box-shadow: none !important;
+  background: none !important;
+  font-size: 20px !important;
+}
+
+.crm-container .credit_card_type-section .crm-credit_card_type-icons a {
+  display: block;
+  float: left;
+  width: 50px;
+  height: 30px;
+  background: url(/administrator/components/com_civicrm/civicrm/i/creditcard-icons.png) no-repeat 0 0 transparent;
+    background-position-x: 0px;
+    background-position-y: 0px;
+  text-indent: -20000px;
+  margin-right: 10px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  border-radius: 3px;
+  border: 1px solid white;
+}
+
+.crm-section .credit_card_number-section {
+  margin-top: 4em;
+}
+
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
+  background-position: -52px 0;
+}
+
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
+  background-position: -100px 0;
+}
+
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
+  background-position: -150px 0;
+}
+
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
+  background-position: -200px 0;
+}
+
+#billingcheckbox {
+  margin-top: 20px;
+}
+
+label[for=billingcheckbox] {
+  margin-top: 17px;
+  position: absolute;
+}
+
+#navigation ul.links li a, #navigation ul.menu li a {
+  display: block;
+  padding: 8px 25px;
+  font-size: 0.8125em;
+  border-right: 1px solid white;
+  text-transform: uppercase;
+  font-family: "open_sansbold",Helvetica,Arial,sans-serif;
+}
+
+.crm-container legend {
+  line-height: 2 !important;
+}
+
+#civicrm-footer {
+  display: none !important;
+}
+
+#breadcrumbs {
+  display: none !important;
+}
+
+.crm-container .btn-primary, .crm-container #crm-submit-buttons input.crm-form-submit:not(.cancel), .crm-container .crm-button input.crm-form-submit:not(.cancel), .crm-container .crm-form-submit.crm-hove$
+    color: #fff;
+    background-color: #713673 !important;
+    border-color: #713673 !important;
+}
