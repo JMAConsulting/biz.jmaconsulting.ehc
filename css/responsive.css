@@ -4,7 +4,6 @@
 #crm-container.crm-public textarea,
 #crm-container.crm-public select {
   width: 100% !important;
-  font-size: 15px !important;
   padding: 5px !important;
   border: 1px solid #ccc !important;
   border-radius: 4px !important;
@@ -19,7 +18,7 @@
 }
 
 .credit_card_info-group input[type=text], .credit_card_info-group select {
-  width: auto !important;
+  width: 200px !important;
   padding: 15px !important;
 }
 
