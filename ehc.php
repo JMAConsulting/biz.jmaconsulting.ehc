@@ -208,15 +208,15 @@ function ehc_civicrm_pre($op, $objectName, $id, &$params) {
 function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($op == 'create') {
     if ($objectName == 'ParticipantPayment') {
-      $customColumns = Civi::cache('ehcCustomColumns')->get('event_columns');
-      $contriCustomIDs = Civi::cache('ehcCustomColumns')->get('contribution_columns');
+      $customColumns = Civi::cache('ehcCustomColumns')->get('eventColumns');
+      $contriCustomIDs = Civi::cache('ehcCustomColumns')->get('contributionColumns');
       if (!$customColumns) {
         $customColumns = getCustomColumnsByEntity('Event');
-        Civi::cache('ehcCustomColumns')->set('event_columns', $customColumns);
+        Civi::cache('ehcCustomColumns')->set('eventColumns', $customColumns);
       }
       if (!$contriCustomIDs) {
         $contriCustomIDs = getCustomColumnsByEntity('Contribution', TRUE);
-        Civi::cache('ehcCustomColumns')->set('contribution_columns', $contriCustomIDs);
+        Civi::cache('ehcCustomColumns')->set('contributionColumns', $contriCustomIDs);
       }
       if (!empty($customColumns) && !empty($contriCustomIDs)) {
         $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $objectRef->participant_id, 'event_id');
@@ -259,15 +259,15 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
       CRM_Core_Smarty::singleton()->assign("financialorg", $org["financial_account_id.contact_id.legal_name"]);
       CRM_Core_Smarty::singleton()->assign("nondeductibleamount", $contribution['non_deductible_amount']);
       if (!empty($objectRef->contribution_page_id)) {
-        $customColumns = Civi::cache('ehcCustomColumns')->get('contribution-page_columns');
-        $contriCustomIDs = Civi::cache('ehcCustomColumns')->get('contribution_columns');
+        $customColumns = Civi::cache('ehcCustomColumns')->get('contributionPageColumns');
+        $contriCustomIDs = Civi::cache('ehcCustomColumns')->get('contributionColumns');
         if (!$customColumns) {
           $customColumns = getCustomColumnsByEntity('ContributionPage');
-          Civi::cache('ehcCustomColumns')->set('contribution-page_columns', $customColumns);
+          Civi::cache('ehcCustomColumns')->set('contributionPageColumns', $customColumns);
         }
         if (!$contriCustomIDs) {
           $contriCustomIDs = getCustomColumnsByEntity('Contribution', TRUE);
-          Civi::cache('ehcCustomColumns')->set('contribution_columns', $contriCustomIDs);
+          Civi::cache('ehcCustomColumns')->set('contributionColumns', $contriCustomIDs);
         }
         if (!empty($customColumns) && !empty($contriCustomIDs)) {
           $tablename = key($customColumns);
