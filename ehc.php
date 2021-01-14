@@ -130,6 +130,21 @@ function ehc_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _ehc_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
+/**
+ * Implements hook_civicrm_container().
+ */
+function ehc_civicrm_container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
+  $container->setDefinition("cache.ehcCustomColumns", new Symfony\Component\DependencyInjection\Definition(
+    'CRM_Utils_Cache_Interface',
+    [
+      [
+        'name' => 'ehc-custom-columns',
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
+      ],
+    ]
+  ))->setFactory('CRM_Utils_Cache::create');
+}
+
 function ehc_civicrm_preProcess($formName, &$form) {
   if ($formName == 'CRM_Contribute_Form_ContributionPage_Settings') {
     $form->assign('customDataType', 'ContributionPage');
@@ -193,15 +208,15 @@ function ehc_civicrm_pre($op, $objectName, $id, &$params) {
 function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($op == 'create') {
     if ($objectName == 'ParticipantPayment') {
-      $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'event columns');
-      $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
+      $customColumns = Civi::cache('ehcCustomColumns')->get('eventColumns');
+      $contriCustomIDs = Civi::cache('ehcCustomColumns')->get('contributionColumns');
       if (!$customColumns) {
         $customColumns = getCustomColumnsByEntity('Event');
-        CRM_Core_BAO_Cache::setItem($customColumns, 'ehc custom columns', 'event columns');
+        Civi::cache('ehcCustomColumns')->set('eventColumns', $customColumns);
       }
       if (!$contriCustomIDs) {
         $contriCustomIDs = getCustomColumnsByEntity('Contribution', TRUE);
-        CRM_Core_BAO_Cache::setItem($contriCustomIDs, 'ehc custom columns', 'contribution columns');
+        Civi::cache('ehcCustomColumns')->set('contributionColumns', $contriCustomIDs);
       }
       if (!empty($customColumns) && !empty($contriCustomIDs)) {
         $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $objectRef->participant_id, 'event_id');
@@ -244,15 +259,15 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
       CRM_Core_Smarty::singleton()->assign("financialorg", $org["financial_account_id.contact_id.legal_name"]);
       CRM_Core_Smarty::singleton()->assign("nondeductibleamount", $contribution['non_deductible_amount']);
       if (!empty($objectRef->contribution_page_id)) {
-        $customColumns = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution-page columns');
-        $contriCustomIDs = CRM_Core_BAO_Cache::getItem('ehc custom columns', 'contribution columns');
+        $customColumns = Civi::cache('ehcCustomColumns')->get('contributionPageColumns');
+        $contriCustomIDs = Civi::cache('ehcCustomColumns')->get('contributionColumns');
         if (!$customColumns) {
           $customColumns = getCustomColumnsByEntity('ContributionPage');
-          CRM_Core_BAO_Cache::setItem($customColumns, 'ehc custom columns', 'contribution-page columns');
+          Civi::cache('ehcCustomColumns')->set('contributionPageColumns', $customColumns);
         }
         if (!$contriCustomIDs) {
           $contriCustomIDs = getCustomColumnsByEntity('Contribution', TRUE);
-          CRM_Core_BAO_Cache::setItem($contriCustomIDs, 'ehc custom columns', 'contribution columns');
+          Civi::cache('ehcCustomColumns')->set('contributionColumns', $contriCustomIDs);
         }
         if (!empty($customColumns) && !empty($contriCustomIDs)) {
           $tablename = key($customColumns);
