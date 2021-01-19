@@ -258,7 +258,7 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
       }
       CRM_Core_Smarty::singleton()->assign("financialorg", $org["financial_account_id.contact_id.legal_name"]);
       CRM_Core_Smarty::singleton()->assign("nondeductibleamount", $contribution['non_deductible_amount']);
-      if (!empty($objectRef->contribution_page_id)) {
+      if (!empty($objectRef->contribution_page_id) || !empty($objectRef->contribution_recur_id)) {
         $customColumns = Civi::cache('ehcCustomColumns')->get('contributionPageColumns');
         $contriCustomIDs = Civi::cache('ehcCustomColumns')->get('contributionColumns');
         if (!$customColumns) {
@@ -277,20 +277,22 @@ function ehc_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             $tablename = key($customColumns);
             $result = CRM_Core_DAO::executeQuery(sprintf("SELECT %s FROM %s WHERE entity_id = %d ",implode(',', $customColumns[$tablename]), $tablename, $objectRef->contribution_recur_id))->fetchAll();
           }
-          if (empty($result)) {
+          if (empty($result) && !empty($objectRef->contribution_page_id)) {
             $result = CRM_Core_DAO::executeQuery(sprintf("SELECT %s FROM %s WHERE entity_id = %d ",implode(',', $customColumns[$tablename]), $tablename, $objectRef->contribution_page_id))->fetchAll();
           }
-          $params = array('id' => $objectRef->id);
-          foreach ($result as $value) {
-            foreach ($customColumns as $tableName => $keys) {
-              $params['custom_' . $contriCustomIDs['Contribution']['sc']] = $value[$keys['sc']];
-              $params['custom_' . $contriCustomIDs['Contribution']['ssc']] = $value[$keys['ssc']];
+          $params = ['id' => $objectRef->id];
+          if (!empty($result)) {
+            foreach ($result as $value) {
+              foreach ($customColumns as $tableName => $keys) {
+                $params['custom_' . $contriCustomIDs['Contribution']['sc']] = $value[$keys['sc']];
+                $params['custom_' . $contriCustomIDs['Contribution']['ssc']] = $value[$keys['ssc']];
 
-              // Add finance team columns.
-              $ftName = CRM_Contribute_PseudoConstant::financialType($objectRef->financial_type_id);
-              $sc = CRM_Core_DAO::singleValueQuery("SELECT name FROM civicrm_option_value WHERE value = '" . $values[$keys['sc']] . "' AND option_group_id = 96");
-              $ssc = CRM_Core_DAO::singleValueQuery("SELECT name FROM civicrm_option_value WHERE value = '" . $values[$keys['ssc']] . "' AND option_group_id = 97");
-              $params['custom_269'] = getFinanceColumn($ftName, $sc, $ssc);
+                // Add finance team columns.
+                $ftName = CRM_Contribute_PseudoConstant::financialType($objectRef->financial_type_id);
+                $sc = CRM_Core_DAO::singleValueQuery("SELECT name FROM civicrm_option_value WHERE value = '" . $values[$keys['sc']] . "' AND option_group_id = 96");
+                $ssc = CRM_Core_DAO::singleValueQuery("SELECT name FROM civicrm_option_value WHERE value = '" . $values[$keys['ssc']] . "' AND option_group_id = 97");
+                $params['custom_269'] = getFinanceColumn($ftName, $sc, $ssc);
+              }
             }
           }
           civicrm_api3('Contribution', 'create', $params);
