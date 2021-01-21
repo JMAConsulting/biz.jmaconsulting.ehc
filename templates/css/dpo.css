@@ -1,3 +1,5 @@
+
+
 #wrapper #center-content {
   width: 100% !important;
 }
@@ -41,23 +43,14 @@ font-weight: bold !important;
   display: block;
 }
 
-.crm-contribution-page-id-6 .other_amount-section { 
+.crm-contribution-page-id-6 .other_amount-section {
   float: right;
   margin-top: -34px;
   margin-right: 156px;
   display: block;
 }
 
-#crm-container.crm-public input[type="text"],
-#crm-container.crm-public input[type="password"],
-#crm-container.crm-public input[type="email"],
-#crm-container.crm-public select {
-  font-size: 10px !important;
-  padding: 5px;
-  border-radius: 3px;
-  vertical-align: middle;
-  max-width: 100%;
-}
+
 
 #crm-container.crm-public .label, #crm-container.crm-public .price-field-amount {
   font-size: 13px !important;
@@ -67,3 +60,15 @@ font-weight: bold !important;
   padding: 0px 0 0px 0 !important;
 }
 
+@media screen and (min-width: 1000px) {
+  #crm-container.crm-public input[type="text"],
+  #crm-container.crm-public input[type="password"],
+  #crm-container.crm-public input[type="email"],
+  #crm-container.crm-public select {
+    font-size: 10px !important;
+    padding: 5px;
+    border-radius: 3px;
+    vertical-align: middle;
+    max-width: 100%;
+  }
+}
