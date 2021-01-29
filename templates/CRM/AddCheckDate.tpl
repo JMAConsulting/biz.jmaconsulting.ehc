@@ -15,12 +15,12 @@
                 var $paymentInstrumentID = $('#payment_instrument_id').val();
                 $('tr.custom_279_-1-row').css('display', 'block');
                 if ($paymentInstrumentID == 4) {
-                  if (!$('div.check_number-section').next('tr.custom_279_-1-row').length) {
+                  if (!$('div.check_number-section').next('tr.custom_279_-1-row').length || !$('div.check_number-section').next('tr.custom_279_-1-row').is(':hidden')) {
                     $('tr.custom_279_-1-row').show();
                     $('tr.custom_279_-1-row').insertAfter('div.check_number-section');
                   }
                   else {
-                    $('div.check_number-section').next('tr.custom_279_-1-row').remove();
+                    $('div.check_number-section').next('tr.custom_279_-1-row').hide();
                     $('tr.custom_279_-1-row').insertAfter('div.check_number-section');
                   }
                 }
